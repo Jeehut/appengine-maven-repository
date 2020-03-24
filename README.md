@@ -1,9 +1,8 @@
 # Installation
 
-## Prerequisites
-
 ### Create a new Project
 First of all, you'll need to go to your [Google Cloud console](https://console.cloud.google.com/projectselector/appengine/create?lang=java&st=true) to create a new App Engine application: 
+Make sure the project Id is something meaningful. It should be the company name for example. This will be the maven URL used to download the dependencies.
 
 ![](https://i.imgur.com/SD1WwP3.png)
 
@@ -21,26 +20,15 @@ $ curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add 
 $ sudo apt-get update && sudo apt-get install google-cloud-sdk
 ```
 
-Do not forget to install the `app-engine-java` [component](https://cloud.google.com/sdk/docs/components#external_package_managers). If you installed the Google Cloud SDK using the instructions above:
-
-```bash
-$ sudo apt-get install google-cloud-sdk-app-engine-java
-```
-
 As a last step, configure the `gcloud` command line environment and select your newly created App Engine project when requested to do so:
 
 ```bash
 $ gcloud init
-$ gcloud auth application-default login
 ```
 
 ## Configuration
 
-Clone (or [download](https://github.com/renaudcerrato/appengine-maven-repository/archive/master.zip)) the source code:
-
-```bash
-$ git clone https://github.com/renaudcerrato/appengine-maven-repository.git
-```
+Clone the project
 
 Update [`WEB-INF/users.txt`](src/main/webapp/WEB-INF/users.txt) to declare users, passwords and permissions:
 
@@ -50,6 +38,7 @@ Update [`WEB-INF/users.txt`](src/main/webapp/WEB-INF/users.txt) to declare users
 # Syntax is:
 # <username>:<password>:<permission>
 # (use '*' as username and password to declare anonymous users)
+*:*:read
 admin:l33t:write
 john:j123:read
 donald:coolpw:read
@@ -59,91 +48,81 @@ guest:guest:list
 
 > Anonymous users are supported by using "*" for both username and password. For example, `*:*:read` will allow anonymous read access. 
 
+We can keep `*:*:read` to allow all the developers to download the dependencies Or maybe specify one account for reading.
+
 ## Deployment
 
+Replace `GCLOUD_CONFIG` in the `build.gradle` file to the project Id created before.
 Once you're ready to go live, just push the application to Google App-Engine:
 
 ```bash
 $ cd appengine-maven-repository
 $ ./gradlew appengineDeploy
 ```
+Or you can run the gradle task `appengineDeploy` from Android Studio. 
 
 And voilà! Your private Maven repository is hosted and running at the following address:
 
 `https://<your-project-id>.appspot.com`
 
-# Usage
+# Publish a library
 
-You'll find some usage examples in the [examples](examples) folder. There's absolutely no extra steps required to fetch and/or deploy Maven artifacts to your repository: simply use your favorite Maven tools as you're used to do. 
-
-An example deploying artifacts using the maven plugin for Gradle:
+Make sure to build the project with the release build type before publishing.
+An example publishing artifacts using the maven plugin for Gradle:
 
 ```gradle
-apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 ...
 
-uploadArchives {
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'com.company_name'
+            artifactId 'utility-android'
+            version '1.0.0'
+            artifact("$buildDir/outputs/aar/utility-debug.aar") // here the file that will be uploaded.
+        }
+    }
     repositories {
-        mavenDeployer {
-            repository(url: "https://<your-project-id>.appspot.com") {
-                authentication(userName: "admin", password: "s3curepa55w0rd")
+        maven {
+            url "https://company_name-android-libraries.appspot.com"
+            credentials {
+                username 'username' // here add the user that has the write permission.
+                password 'password'
             }
-            pom.version = "1.0.0"
-            pom.artifactId = "test"
-            pom.groupId = "com.example"
         }
     }
 }
 ```
 
-Using the above plugin, deploying artifacts to your repository is as simple as:
+Using the above plugin, publishing artifacts to your repository is as simple as:
 
 ```bash
-$ ./gradlew upload
+$ ./gradlew publish
 ```
+Or you can run the gradle task `publish` from the Android Studio after syncing the project.
 
 In the other way, accessing password protected Maven repositories using Gradle only requires you to specify the `credentials` closure:
 
 ```gradle
 repositories {
-    ...
     maven {
         credentials {
-            username 'user'
-            password 'YouCantGuess'
+            username 'user' // user that has a read access or maybe you can remove the credentials block if you allow the artifact to be accessible without authentication.
+            password 'password'
         }
-        url "https://<your-project-id>.appspot.com"
+        url "https://company_name-android-libraries.appspot.com"
     }
+}
+
+dependencies {
+    implementation "com.company_name:utility-android:1.0.0"
 }
 ```
 
-> Ensure you do NOT commit credentials with your code. With Gradle, you can achieve this by amending the above examples using the approach specified [here](http://stackoverflow.com/a/12751665/752167) of moving your creds to `~/.gradle/gradle.properties` and only referring to the variable names within your build.
 
 # Limitations
 
 Google App-Engine HTTP requests are limited to 32MB - and thus, any artifacts above that limit can't be hosted.
 
-# File Management (Google Cloud File Storage)
-
-The provided examples only provide a few gradle files that upload an installed local maven artifact. Sometimes there might be need to perform more file functions not available from gradle such as deletion.
-The [documentation](https://cloud.google.com/storage/docs/uploading-objects) includes a button that launches a browser based file browser which presents a browser interface to perform file management.
-
-# License
-
-```
-Copyright 2018 Cerrato Renaud
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-```
