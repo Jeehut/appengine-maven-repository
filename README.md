@@ -71,7 +71,7 @@ Or you can run the gradle task `appengineDeploy` from Android Studio.
 
 And voilà! Your private Maven repository is hosted and running at the following address:
 
-`https://company_name.appspot.com`
+`https://company-android-libraries.appspot.com`
 
 # Publish a library
 
@@ -86,7 +86,7 @@ apply plugin: 'maven-publish'
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId 'com.company_name'
+            groupId 'com.company-android-libraries'
             artifactId 'utility-android'
             version '1.0.0'
             artifact("$buildDir/outputs/aar/utility-debug.aar") // here the file that will be uploaded.
@@ -94,7 +94,7 @@ publishing {
     }
     repositories {
         maven {
-            url "https://company_name-android-libraries.appspot.com"
+            url "https://company-android-libraries.appspot.com"
             credentials {
                 username 'username' // here add the user that has the write permission.
                 password 'password'
@@ -120,12 +120,12 @@ repositories {
             username 'user' // user that has a read access or maybe you can remove the credentials block if you allow the artifact to be accessible without authentication.
             password 'password'
         }
-        url "https://company_name-android-libraries.appspot.com"
+        url "https://company-android-libraries.appspot.com"
     }
 }
 
 dependencies {
-    implementation "com.company_name:utility-android:1.0.0"
+    implementation "com.company-android-libraries:utility-android:1.0.0"
 }
 ```
 
