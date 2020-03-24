@@ -1,29 +1,3 @@
-# appengine-maven-repository
-
-Private Maven repositories hosted on Google App-Engine, backed by Google Cloud Storage, supporting HTTP Basic authentication and minimalistic user access control deployed in less than 5 minutes.
-
-   * [Why ?](#why-)
-   * [Installation](#installation)
-      * [Prerequisites](#prerequisites)
-      * [Configuration](#configuration)
-      * [Deployment](#deployment)
-   * [Usage](#usage)
-   * [Limitations](#limitations)
-   * [License](#license)
-   
-# Why ?
-
-Private Maven repositories shouldn't cost you [an arm and a leg](https://www.cloudrepo.io/pricing.html), nor requires you to become a [Linux Sys-Admin](https://inthecheesefactory.com/blog/how-to-setup-private-maven-repository/en) to setup, and should ideally be **zero maintenance** and **costs nothing**.
-
-Thanks to Google App-Engine's [free quotas](https://cloud.google.com/appengine/docs/quotas), you'll benefits for free of:
-
-* 5GB of storage
-* 1GB of daily incoming bandwidth
-* 1GB of daily outgoing bandwidth
-* 20,000+ storage ops per day
-
-Moreover, no credit card is required to benefits of the quotas above.
-
 # Installation
 
 ## Prerequisites
