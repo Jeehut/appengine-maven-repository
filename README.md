@@ -71,7 +71,7 @@ Or you can run the gradle task `appengineDeploy` from Android Studio.
 
 And voilà! Your private Maven repository is hosted and running at the following address:
 
-`https://<your-project-id>.appspot.com`
+`https://company_name.appspot.com`
 
 # Publish a library
 
