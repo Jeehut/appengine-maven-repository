@@ -53,6 +53,14 @@ We can keep `*:*:read` to allow all the developers to download the dependencies 
 ## Deployment
 
 Replace `GCLOUD_CONFIG` in the `build.gradle` file to the project Id created before.
+```
+appengine {
+    deploy {
+        projectId = 'GCLOUD_CONFIG'
+        version = 'v1'
+    }
+}
+```
 Once you're ready to go live, just push the application to Google App-Engine:
 
 ```bash
